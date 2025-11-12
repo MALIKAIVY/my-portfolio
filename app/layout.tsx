@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Your Name - Creative Developer',
+  title: 'Ivy Malika - Creative Developer',
   description: 'Portfolio showcasing interactive web experiences',
 }
 
