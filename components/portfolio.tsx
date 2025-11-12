@@ -671,7 +671,7 @@ export default function Portfolio() {
           </h2>
           
           <p 
-            className="text-xl text-gray-400 text-center mb-8 max-w-2xl mx-auto transition-all duration-700"
+            className="text-xl text-gray-400 text-center mb-16 max-w-2xl mx-auto transition-all duration-700"
             data-animate="true"
             id="skills-subtitle"
             style={{
@@ -716,6 +716,7 @@ export default function Portfolio() {
             ))}
           </div>
         </div>
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent" />
       </section>
 
       {/* Contact Section */}
