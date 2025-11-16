@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { Menu, X, Github, Linkedin, Mail, ExternalLink, ArrowDown, Send, Sparkles, LucideIcon } from 'lucide-react';
-import { SiReact, SiNextdotjs, SiNodedotjs, SiAmazon, SiWeb3Dotjs, SiMongodb } from 'react-icons/si';
+import { Menu, X, Github, Linkedin, Mail, ExternalLink, ArrowDown, Send, Sparkles, LucideIcon, Cloud, CloudCog, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { SiReact, SiNextdotjs, SiNodedotjs, SiAmazon, SiWeb3Dotjs, SiMongodb, SiOracle } from 'react-icons/si';
 
 interface Project {
   title: string;
@@ -16,6 +16,12 @@ interface Project {
 }
 
 interface Skill {
+  name: string;
+  icon: React.ComponentType<{ size?: number; className?: string; color?: string }>;
+  color: string; // brand color for the icon
+}
+
+interface Certification {
   name: string;
   icon: React.ComponentType<{ size?: number; className?: string; color?: string }>;
   color: string; // brand color for the icon
@@ -43,6 +49,8 @@ export default function Portfolio() {
   const [formData, setFormData] = useState<FormData>({ name: '', email: '', message: '' });
   const [visibleElements, setVisibleElements] = useState<Set<string>>(new Set());
   const [mounted, setMounted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
 
   const sectionsRef = useRef<{ [key: string]: HTMLElement | null }>({});
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -65,7 +73,6 @@ export default function Portfolio() {
   });
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -127,12 +134,36 @@ export default function Portfolio() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // In a real application, you would handle form submission (e.g., to an API or email service) here
-    alert('Message sent! (Demo)');
-    setFormData({ name: '', email: '', message: '' }); // Clear form
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: '' });
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message');
+      }
+
+      setSubmitStatus({ type: 'success', message: 'Message sent successfully! I\'ll get back to you soon.' });
+      setFormData({ name: '', email: '', message: '' }); // Clear form
+    } catch (error) {
+      setSubmitStatus({ 
+        type: 'error', 
+        message: error instanceof Error ? error.message : 'Failed to send message. Please try again.' 
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const projects: Project[] = [
@@ -182,6 +213,12 @@ export default function Portfolio() {
     { name: "Cloud", icon: SiAmazon, color: "#FF9900" }, // AWS orange
     { name: "Web3", icon: SiWeb3Dotjs, color: "#F16822" }, // Web3 orange
     { name: "MongoDB", icon: SiMongodb, color: "#47A248" } // MongoDB green
+  ];
+
+  const certifications: Certification[] = [
+    { name: "Oracle GenAI", icon: SiOracle, color: "#F80000" }, // Oracle red
+    { name: "Microsoft Azure AI in Cloud", icon: CloudCog, color: "#0078D4" }, // Azure blue (using CloudCog from lucide)
+    { name: "Fundamentals of Cloud Computing", icon: Cloud, color: "#60A5FA" } // Cloud blue (using lucide icon)
   ];
 
   const contactInfo: ContactInfo[] = [
@@ -248,7 +285,7 @@ export default function Portfolio() {
           </button>
           
           <div className="hidden md:flex gap-8">
-            {['home', 'about', 'projects', 'skills', 'contact'].map((section) => (
+            {['home', 'about', 'projects', 'skills', 'certifications', 'contact'].map((section) => (
               <button
                 key={section}
                 onClick={() => scrollToSection(section)}
@@ -283,7 +320,7 @@ export default function Portfolio() {
         menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
       }`}>
         <div className="flex flex-col items-center justify-center h-full gap-8">
-          {['home', 'about', 'projects', 'skills', 'contact'].map((section, idx) => (
+          {['home', 'about', 'projects', 'skills', 'certifications', 'contact'].map((section, idx) => (
             <button
               key={section}
               onClick={() => scrollToSection(section)}
@@ -498,34 +535,6 @@ export default function Portfolio() {
                 {text}
               </p>
             ))}
-
-            <div className="grid md:grid-cols-3 gap-6 mt-16">
-              {[
-                { number: '50+', label: 'Projects Completed' },
-                { number: '5+', label: 'Years Experience' },
-                { number: '30+', label: 'Happy Clients' }
-              ].map((stat, idx) => (
-                <div 
-                  key={idx}
-                  className="group relative bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 text-center hover:border-white/30 transition-all duration-500 overflow-hidden"
-                  data-animate="true"
-                  id={`stat-${idx}`}
-                  style={{
-                    opacity: visibleElements.has(`stat-${idx}`) ? 1 : 0,
-                    transform: visibleElements.has(`stat-${idx}`) ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.9)',
-                    transitionDelay: `${300 + idx * 100}ms`
-                  }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-blue-500/10 group-hover:via-purple-500/10 group-hover:to-pink-500/10 transition-all duration-500" />
-                  <div className="relative z-10">
-                    <div className="text-5xl font-light bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mb-3 transition-transform duration-300 group-hover:scale-110">
-                      {stat.number}
-                    </div>
-                    <div className="text-gray-400 text-sm">{stat.label}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
@@ -719,6 +728,82 @@ export default function Portfolio() {
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent" />
       </section>
 
+      {/* Certifications Section */}
+      <section 
+        ref={(el) => {sectionsRef.current['certifications'] = el}}
+        id="certifications" 
+        className="px-6 pt-20 pb-20 relative"
+      >
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent" />
+        
+        <div className="max-w-6xl mx-auto">
+          <h2 
+            className="text-4xl md:text-6xl font-light mb-8 text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent transition-all duration-1000"
+            data-animate="true"
+            id="certifications-title"
+            style={{
+              opacity: visibleElements.has('certifications-title') ? 1 : 0,
+              transform: visibleElements.has('certifications-title') ? 'scale(1)' : 'scale(0.8)',
+            }}
+          >
+            Certifications
+          </h2>
+          
+          <p 
+            className="text-xl text-gray-400 text-center mb-16 max-w-2xl mx-auto transition-all duration-700"
+            data-animate="true"
+            id="certifications-subtitle"
+            style={{
+              opacity: visibleElements.has('certifications-subtitle') ? 1 : 0,
+              transform: visibleElements.has('certifications-subtitle') ? 'translateY(0)' : 'translateY(20px)',
+              transitionDelay: '100ms'
+            }}
+          >
+            Professional certifications validating my expertise
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+            {certifications.map((cert, idx) => (
+              <div
+                key={idx}
+                className="group flex flex-col items-center text-center cursor-pointer"
+                data-animate="true"
+                id={`cert-${idx}`}
+                style={{
+                  opacity: visibleElements.has(`cert-${idx}`) ? 1 : 0,
+                  transform: visibleElements.has(`cert-${idx}`) 
+                    ? 'translateY(0) scale(1)' 
+                    : 'translateY(30px) scale(0.8)',
+                  transition: `all 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${idx * 100}ms`
+                }}
+              >
+                <div 
+                  className="mb-4 group-hover:scale-125 group-hover:-translate-y-2 transition-all duration-500 ease-out"
+                  style={{
+                    animation: visibleElements.has(`cert-${idx}`) 
+                      ? `float 3s ease-in-out infinite ${idx * 0.2}s` 
+                      : 'none'
+                  }}
+                >
+                  {cert.name === "Microsoft Azure AI in Cloud" || cert.name === "Fundamentals of Cloud Computing" ? (
+                    <div style={{ color: cert.color }}>
+                      <cert.icon size={60} />
+                    </div>
+                  ) : (
+                    <cert.icon size={60} color={cert.color} />
+                  )}
+                </div>
+                
+                <h3 className="text-lg font-light text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-500 group-hover:bg-clip-text transition-all duration-300">
+                  {cert.name}
+                </h3>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent" />
+      </section>
+
       {/* Contact Section */}
       <section 
         ref={(el) => {sectionsRef.current['contact'] = el}}
@@ -804,11 +889,38 @@ export default function Portfolio() {
 
                 <button
                   type="submit"
-                  className="w-full px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl font-semibold hover:scale-105 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/50 flex items-center justify-center gap-2 group"
+                  disabled={isSubmitting}
+                  className="w-full px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl font-semibold hover:scale-105 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/50 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                  <Send size={20} className="group-hover:translate-x-1 transition-transform duration-300" />
-                  Send Message
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={20} className="animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send size={20} className="group-hover:translate-x-1 transition-transform duration-300" />
+                      Send Message
+                    </>
+                  )}
                 </button>
+
+                {submitStatus.type && (
+                  <div
+                    className={`mt-4 p-4 rounded-xl flex items-center gap-3 transition-all duration-300 ${
+                      submitStatus.type === 'success'
+                        ? 'bg-green-500/10 border border-green-500/30 text-green-400'
+                        : 'bg-red-500/10 border border-red-500/30 text-red-400'
+                    }`}
+                  >
+                    {submitStatus.type === 'success' ? (
+                      <CheckCircle2 size={20} className="flex-shrink-0" />
+                    ) : (
+                      <AlertCircle size={20} className="flex-shrink-0" />
+                    )}
+                    <p className="text-sm">{submitStatus.message}</p>
+                  </div>
+                )}
               </form>
             </div>
 
