@@ -855,7 +855,7 @@ export default function Portfolio() {
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    className="w-full px-4 py-3 bg-white border border-[#D4C4B0]/30 rounded-xl focus:outline-none focus:border-[#B8866C] focus:ring-2 focus:ring-[#B8866C]/20 transition-all"
                     placeholder="Your name"
                     required
                   />
@@ -868,7 +868,7 @@ export default function Portfolio() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                    className="w-full px-4 py-3 bg-white border border-[#D4C4B0]/30 rounded-xl focus:outline-none focus:border-[#B8866C] focus:ring-2 focus:ring-[#B8866C]/20 transition-all"
                     placeholder="your@email.com"
                     required
                   />
@@ -881,7 +881,7 @@ export default function Portfolio() {
                     rows={5}
                     value={formData.message}
                     onChange={(e) => setFormData({...formData, message: e.target.value})}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all resize-none"
+                    className="w-full px-4 py-3 bg-white border border-[#D4C4B0]/30 rounded-xl focus:outline-none focus:border-[#B8866C] focus:ring-2 focus:ring-[#B8866C]/20 transition-all resize-none"
                     placeholder="Tell me about your project..."
                     required
                   />

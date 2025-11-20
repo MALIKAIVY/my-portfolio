@@ -2,12 +2,15 @@
 
 @layer base {
   body {
-    background-color: #000;
-    color: #fff;
+    background: linear-gradient(135deg, #F5F1EB 0%, #E8DDD4 25%, #F5F1EB 50%, #E8DDD4 75%, #F5F1EB 100%);
+    background-size: 200% 200%;
+    animation: gradient 15s ease infinite;
+    color: #2C2416;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     font-weight: 300;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
   }
   
   * {
@@ -16,21 +19,21 @@
   
   input, textarea {
     font-family: inherit;
-    color: #fff !important;
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #2C2416 !important;
+    background-color: #ffffff !important;
+    border: 1px solid rgba(44, 36, 22, 0.15) !important;
     border-radius: 0.75rem;
     padding: 0.75rem 1rem;
   }
   
   input::placeholder, textarea::placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
+    color: rgba(44, 36, 22, 0.4) !important;
   }
   
   input:focus, textarea:focus {
     outline: none;
-    border-color: rgba(168, 85, 247, 1) !important;
-    box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2) !important;
+    border-color: rgba(184, 134, 108, 0.6) !important;
+    box-shadow: 0 0 0 2px rgba(184, 134, 108, 0.2) !important;
   }
   
   button {
@@ -109,14 +112,14 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #000;
+  background: rgba(232, 221, 212, 0.3);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+  background: linear-gradient(to bottom, #D4C4B0, #C9B8A3);
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #2563eb, #7c3aed);
+  background: linear-gradient(to bottom, #C9B8A3, #B8866C);
 }
