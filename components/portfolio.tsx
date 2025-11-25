@@ -188,7 +188,7 @@ export default function Portfolio() {
       description: "Admin Portal for managing a chama platform",
       tech: ["React", "Next.js", "Tailwind","typescript"],
       gradient: "from-green-500 via-emerald-500 to-teal-500",
-      image: "/admin-portal.png"
+      image: "/qundi-screenshot.png"
     },
     {
       title: "E-learning Platform",
@@ -341,11 +341,11 @@ export default function Portfolio() {
       <section 
         ref={(el) => {sectionsRef.current['home'] = el}}
         id="home" 
-        className="min-h-screen flex items-center relative px-6 py-20"
+        className="min-h-screen flex items-center relative py-20"
       >
-        <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-12 items-center z-10 px-6 md:px-12">
+        <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-12 items-center z-10">
           {/* Left Column - Content */}
-          <div className="text-left pl-4 md:pl-8">
+          <div className="text-left">
             <h1 
               className="text-5xl md:text-7xl font-thin mb-4 text-white leading-tight tracking-tight"
               data-animate="true"
