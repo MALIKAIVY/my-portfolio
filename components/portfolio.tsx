@@ -1,9 +1,34 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
-import { Menu, X, Github, Linkedin, Mail, ExternalLink, ArrowDown, Send, Sparkles, LucideIcon, Cloud, CloudCog, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
-import { SiReact, SiNextdotjs, SiNodedotjs, SiAmazon, SiWeb3Dotjs, SiMongodb, SiOracle } from 'react-icons/si';
+import {
+  AlertCircle,
+  ArrowRight,
+  CheckCircle2,
+  Cloud,
+  CloudCog,
+  ExternalLink,
+  Github,
+  Layout,
+  Linkedin,
+  Loader2,
+  LucideIcon,
+  Mail,
+  Menu,
+  Monitor,
+  Send,
+  Server,
+  X,
+} from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  SiAmazon,
+  SiMongodb,
+  SiNextdotjs,
+  SiNodedotjs,
+  SiOracle,
+  SiReact,
+  SiWeb3Dotjs,
+} from "react-icons/si";
 
 interface Project {
   title: string;
@@ -17,14 +42,34 @@ interface Project {
 
 interface Skill {
   name: string;
-  icon: React.ComponentType<{ size?: number; className?: string; color?: string }>;
+  icon: React.ComponentType<{
+    size?: number;
+    className?: string;
+    color?: string;
+  }>;
   color: string; // brand color for the icon
 }
 
 interface Certification {
   name: string;
-  icon: React.ComponentType<{ size?: number; className?: string; color?: string }>;
+  icon: React.ComponentType<{
+    size?: number;
+    className?: string;
+    color?: string;
+  }>;
   color: string; // brand color for the icon
+}
+
+interface Service {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+}
+
+interface Testimonial {
+  quote: string;
+  name: string;
+  role: string;
 }
 
 interface ContactInfo {
@@ -43,22 +88,47 @@ interface FormData {
 
 export default function Portfolio() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('home');
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [activeSection, setActiveSection] = useState("home");
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [formData, setFormData] = useState<FormData>({ name: '', email: '', message: '' });
-  const [visibleElements, setVisibleElements] = useState<Set<string>>(new Set());
+  const [formData, setFormData] = useState<FormData>({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [visibleElements, setVisibleElements] = useState<Set<string>>(
+    new Set(),
+  );
   const [mounted, setMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' });
-
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({ type: null, message: "" });
   const sectionsRef = useRef<{ [key: string]: HTMLElement | null }>({});
+  const SECTION_ORDER = [
+    "home",
+    "services",
+    "about",
+    "skills",
+    "projects",
+    "testimonials",
+    "contact",
+  ] as const;
+  const SECTION_LABELS: Record<(typeof SECTION_ORDER)[number], string> = {
+    home: "Home",
+    services: "Services",
+    about: "About",
+    skills: "Skills & Certifications",
+    projects: "Projects",
+    testimonials: "Testimonials",
+    contact: "Contact",
+  };
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   // Generate random particle properties once using useState with lazy initializer
   // Only generate on client to avoid hydration mismatch
   const [particles] = useState(() => {
-    if (typeof window === 'undefined') return [];
+    if (typeof window === "undefined") return [];
     return [...Array(40)].map(() => ({
       width: Math.random() * 4 + 1,
       height: Math.random() * 4 + 1,
@@ -85,10 +155,10 @@ export default function Portfolio() {
           }
         });
       },
-      { threshold: 0.1, rootMargin: '-50px' }
+      { threshold: 0.1, rootMargin: "-50px" },
     );
 
-    document.querySelectorAll('[data-animate]').forEach((el) => {
+    document.querySelectorAll("[data-animate]").forEach((el) => {
       observerRef.current?.observe(el);
     });
 
@@ -97,39 +167,32 @@ export default function Portfolio() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      const totalScroll =
+        document.documentElement.scrollHeight - window.innerHeight;
       const currentScroll = window.scrollY;
       setScrollProgress((currentScroll / totalScroll) * 100);
 
-      // Determine active section based on scroll position
-      Object.entries(sectionsRef.current).forEach(([key, section]) => {
+      // Determine active section (last section in order that contains viewport top)
+      for (const key of SECTION_ORDER) {
+        const section = sectionsRef.current[key];
         if (section) {
           const rect = section.getBoundingClientRect();
-          // Check if the top of the section is near the viewport top
-          if (rect.top <= 100 && rect.bottom >= 100) {
-            setActiveSection(key);
-          }
+          if (rect.top <= 100 && rect.bottom >= 100) setActiveSection(key);
         }
-      });
+      }
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
   const scrollToSection = (sectionId: string) => {
     const section = sectionsRef.current[sectionId];
     if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
+      section.scrollIntoView({ behavior: "smooth" });
       setMenuOpen(false);
     }
   };
@@ -137,13 +200,13 @@ export default function Portfolio() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitStatus({ type: null, message: '' });
+    setSubmitStatus({ type: null, message: "" });
 
     try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
+      const response = await fetch("/api/contact", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
@@ -151,15 +214,21 @@ export default function Portfolio() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to send message');
+        throw new Error(data.error || "Failed to send message");
       }
 
-      setSubmitStatus({ type: 'success', message: 'Message sent successfully! I\'ll get back to you soon.' });
-      setFormData({ name: '', email: '', message: '' }); // Clear form
+      setSubmitStatus({
+        type: "success",
+        message: "Message sent successfully! I'll get back to you soon.",
+      });
+      setFormData({ name: "", email: "", message: "" }); // Clear form
     } catch (error) {
-      setSubmitStatus({ 
-        type: 'error', 
-        message: error instanceof Error ? error.message : 'Failed to send message. Please try again.' 
+      setSubmitStatus({
+        type: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to send message. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
@@ -170,40 +239,57 @@ export default function Portfolio() {
     {
       title: "Payment Gateway",
       description: "Payment Gateway for online transactions",
-      tech: ["Next.js", "Stripe", "Crypto.js","Node.js","TailwindCSS", "react","typescript"],
+      tech: [
+        "Next.js",
+        "Stripe",
+        "Crypto.js",
+        "Node.js",
+        "TailwindCSS",
+        "react",
+        "typescript",
+      ],
       gradient: "from-purple-500 via-pink-500 to-red-500",
       image: "/payment-gateway app.png",
-      liveLink: "https://sqp-clt.vercel.app/"
+      liveLink: "https://sqp-clt.vercel.app/",
     },
     {
       title: "E-Commerce Platform",
-      description: "Full-stack marketplace with real-time inventory and payment processing",
-      tech: ["Next.js", "Stripe","Node.js","Express.js", "TailwindCSS", "react","typescript"],
+      description:
+        "Full-stack marketplace with real-time inventory and payment processing",
+      tech: [
+        "Next.js",
+        "Stripe",
+        "Node.js",
+        "Express.js",
+        "TailwindCSS",
+        "react",
+        "typescript",
+      ],
       gradient: "from-orange-500 via-red-500 to-pink-500",
       image: "/redbead.png",
-      liveLink: "https://rbd-clt-sooty.vercel.app/"
+      liveLink: "https://rbd-clt-sooty.vercel.app/",
     },
     {
       title: "Admin Portal",
       description: "Admin Portal for managing a chama platform",
-      tech: ["React", "Next.js", "Tailwind","typescript"],
+      tech: ["React", "Next.js", "Tailwind", "typescript"],
       gradient: "from-green-500 via-emerald-500 to-teal-500",
-      image: "/qundi-screenshot.png"
+      image: "/qundi-screenshot.png",
     },
     {
       title: "E-learning Platform",
       description: "E-learning Platform for online tourism courses",
-      tech: ["Prisma", "PostgreSQL", "TailwindCSS", "react","typescript"],
+      tech: ["Prisma", "PostgreSQL", "TailwindCSS", "react", "typescript"],
       gradient: "from-yellow-500 via-orange-500 to-red-500",
-      image: "✅"
+      image: "✅",
     },
     {
       title: "Weather App",
       description: "Beautiful weather forecasts with maps and location alerts",
       tech: ["React", "API", "Leaflet"],
       gradient: "from-indigo-500 via-purple-500 to-pink-500",
-      image: "🌤️"
-    }
+      image: "🌤️",
+    },
   ];
 
   const skills: Skill[] = [
@@ -212,403 +298,630 @@ export default function Portfolio() {
     { name: "Node.js", icon: SiNodedotjs, color: "#339933" }, // Node.js green
     { name: "Cloud", icon: SiAmazon, color: "#FF9900" }, // AWS orange
     { name: "Web3", icon: SiWeb3Dotjs, color: "#F16822" }, // Web3 orange
-    { name: "MongoDB", icon: SiMongodb, color: "#47A248" } // MongoDB green
+    { name: "MongoDB", icon: SiMongodb, color: "#47A248" }, // MongoDB green
   ];
 
   const certifications: Certification[] = [
     { name: "Oracle GenAI", icon: SiOracle, color: "#F80000" }, // Oracle red
     { name: "Microsoft Azure AI in Cloud", icon: CloudCog, color: "#0078D4" }, // Azure blue (using CloudCog from lucide)
-    { name: "Fundamentals of Cloud Computing", icon: Cloud, color: "#60A5FA" } // Cloud blue (using lucide icon)
+    { name: "Fundamentals of Cloud Computing", icon: Cloud, color: "#60A5FA" }, // Cloud blue (using lucide icon)
+  ];
+
+  const services: Service[] = [
+    {
+      title: "Web Development",
+      description:
+        "Full-stack web applications with modern frameworks like Next.js and React.",
+      icon: Monitor,
+    },
+    {
+      title: "API & Backend",
+      description:
+        "RESTful APIs, databases, and server-side logic with Node.js and cloud services.",
+      icon: Server,
+    },
+    {
+      title: "UI/UX Implementation",
+      description:
+        "Responsive, accessible interfaces that match your design and brand.",
+      icon: Layout,
+    },
+  ];
+
+  const testimonials: Testimonial[] = [
+    {
+      quote:
+        "Ivy delivered a robust payment gateway on time. Professional and easy to work with.",
+      name: "Hamilton Mwaila",
+      role: "Product Manager",
+    },
+    {
+      quote:
+        "Clean code, clear communication, and great problem-solving. Highly recommend.",
+      name: "Hazel Oketch",
+      role: "Startup Founder",
+    },
   ];
 
   const contactInfo: ContactInfo[] = [
-    { icon: Mail, label: 'Email', value: 'ayukoivy03@gmail.com', href: 'mailto:ayukoivy03@gmail.com', color: 'from-blue-500 to-cyan-500' },
-    { icon: Github, label: 'GitHub', value: '@MALIKAIVY', href: 'https://github.com/MALIKAIVY', color: 'from-purple-500 to-pink-500' },
-    { icon: Linkedin, label: 'LinkedIn', value: '@ivy-ayuko', href: 'https://www.linkedin.com/in/ivy-ayuko', color: 'from-blue-600 to-blue-400' }
+    {
+      icon: Mail,
+      label: "Email",
+      value: "ayukoivy03@gmail.com",
+      href: "mailto:ayukoivy03@gmail.com",
+      color: "from-blue-500 to-cyan-500",
+    },
+    {
+      icon: Github,
+      label: "GitHub",
+      value: "@MALIKAIVY",
+      href: "https://github.com/MALIKAIVY",
+      color: "from-purple-500 to-pink-500",
+    },
+    {
+      icon: Linkedin,
+      label: "LinkedIn",
+      value: "@ivy-ayuko",
+      href: "https://www.linkedin.com/in/ivy-ayuko",
+      color: "from-blue-600 to-blue-400",
+    },
   ];
 
   return (
-    <div className="bg-black text-white min-h-screen relative overflow-hidden">
-      {/* Progress Bar */}
-      <div className="fixed top-0 left-0 w-full h-1 bg-white/10 z-50">
-        <div 
-          className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transition-all duration-300 relative"
+    <div className="bg-[#FAFAF9] text-[#1a1a1a] min-h-screen relative overflow-hidden">
+      {/* Progress Bar - accent color */}
+      <div className="fixed top-0 left-0 w-full h-0.5 bg-[#14532d]/30 z-50">
+        <div
+          className="h-full bg-[#f59e0b] transition-all duration-300"
           style={{ width: `${scrollProgress}%` }}
-        >
-          <div className="absolute right-0 top-0 w-20 h-full bg-gradient-to-l from-transparent to-white/30 animate-pulse" />
-        </div>
-      </div>
-
-      {/* Background Effects */}
-      <div className="fixed inset-0 pointer-events-none">
-        {/* Mouse Follower Gradient */}
-        <div 
-          className="absolute opacity-20 transition-all duration-1000"
-          style={{
-            width: '800px',
-            height: '800px',
-            left: mousePosition.x - 400,
-            top: mousePosition.y - 400,
-            background: 'radial-gradient(circle, rgba(99, 102, 241, 0.4), transparent 70%)',
-            filter: 'blur(60px)',
-          }}
         />
-        
-        {/* Fixed Blobs (You'll need to define 'animate-float-slow' and 'animate-float-slower' in your CSS/Tailwind config) */}
-        {/* Example CSS for these animations (outside of this component):
-        
-        @keyframes float-slow {
-          0% { transform: translate(0, 0); }
-          50% { transform: translate(-20px, 40px); }
-          100% { transform: translate(0, 0); }
-        }
-        @keyframes float-slower {
-          0% { transform: translate(0, 0); }
-          50% { transform: translate(30px, -50px); }
-          100% { transform: translate(0, 0); }
-        }
-        
-        */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-float-slow" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-float-slower" />
       </div>
 
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-40 backdrop-blur-xl bg-black/50 border-b border-white/10 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <button 
-            onClick={() => scrollToSection('home')}
-            className="text-2xl font-light bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent hover:scale-105 transition-transform relative group"
+      {/* Background - clean light */}
+      <div
+        className="fixed inset-0 pointer-events-none bg-[#FAFAF9]"
+        aria-hidden
+      />
+
+      {/* Navigation - dark green header like inspo */}
+      <nav className="fixed top-4 left-12 right-12 z-40 bg-[#14532d] rounded-full shadow-lg transition-all duration-300 md:left-24 md:right-24 lg:left-32 lg:right-32 xl:left-48 xl:right-48">
+        <div className="container mx-auto pl-4 pr-6 py-2 flex justify-between items-center">
+          <button
+            onClick={() => scrollToSection("home")}
+            className="flex items-center gap-2 text-white font-semibold text-lg hover:opacity-90 transition-opacity"
           >
-            Ivy Malika
-            <span className="absolute -inset-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity rounded-lg" />
+            <span className="w-7 h-7 rounded-full bg-[#f59e0b] flex items-center justify-center text-white text-sm font-bold shrink-0 shadow-md">
+              I
+            </span>
+            <span>Ivy Malika.</span>
           </button>
-          
-          <div className="hidden md:flex gap-8">
-            {['home', 'about', 'projects', 'skills', 'certifications', 'contact'].map((section) => (
+
+          <div className="hidden md:flex gap-6 lg:gap-8">
+            {SECTION_ORDER.map((section) => (
               <button
                 key={section}
                 onClick={() => scrollToSection(section)}
-                className={`relative group capitalize transition-all duration-300 ${
-                  activeSection === section ? 'text-white scale-110' : 'text-gray-400 hover:text-white'
+                className={`relative transition-all duration-300 font-medium text-white hover:opacity-90 ${
+                  activeSection === section ? "" : "opacity-90"
                 }`}
               >
-                {section}
-                <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-500 transition-all duration-300 ${
-                  activeSection === section ? 'w-full opacity-100' : 'w-0 opacity-0 group-hover:w-full group-hover:opacity-100'
-                }`} />
+                {SECTION_LABELS[section]}
                 {activeSection === section && (
-                  <span className="absolute -inset-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-lg rounded-lg animate-pulse" />
+                  <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#f59e0b] rounded-full" />
                 )}
               </button>
             ))}
           </div>
 
-          <button 
+          <div className="hidden md:block">
+            <button
+              onClick={() => scrollToSection("contact")}
+              className="px-5 py-2 rounded-full bg-white text-[#14532d] font-semibold border-2 border-white hover:bg-transparent hover:text-white transition-all duration-300"
+            >
+              Contact Me
+            </button>
+          </div>
+
+          <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden text-white hover:scale-110 transition-transform relative"
+            className="md:hidden text-white hover:opacity-90 transition-opacity"
           >
-            <div className={`transition-transform duration-300 ${menuOpen ? 'rotate-90' : ''}`}>
+            <div
+              className={`transition-transform duration-300 ${menuOpen ? "rotate-90" : ""}`}
+            >
               {menuOpen ? <X size={24} /> : <Menu size={24} />}
             </div>
           </button>
         </div>
       </nav>
 
-      {/* Mobile Menu */}
-      <div className={`fixed inset-0 z-30 bg-black/98 backdrop-blur-2xl md:hidden transition-all duration-700 ${
-        menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-      }`}>
+      {/* Mobile Menu - dark green overlay */}
+      <div
+        className={`fixed inset-0 z-30 bg-[#14532d] md:hidden transition-all duration-700 ${
+          menuOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+      >
         <div className="flex flex-col items-center justify-center h-full gap-8">
-          {['home', 'about', 'projects', 'skills', 'certifications', 'contact'].map((section, idx) => (
+          {SECTION_ORDER.map((section, idx) => (
             <button
               key={section}
               onClick={() => scrollToSection(section)}
-              className="group relative text-3xl capitalize text-gray-300 hover:text-white transition-all hover:scale-110"
-              // Note: You need to define the 'slideInFromLeft' keyframe in your CSS/Tailwind config
+              className={`text-2xl font-medium transition-all text-white ${
+                activeSection === section
+                  ? "underline decoration-[#f59e0b] underline-offset-4"
+                  : "opacity-90"
+              }`}
               style={{
-                animation: menuOpen ? `slideInFromLeft 0.6s ease-out ${idx * 0.1}s both` : 'none'
+                animation: menuOpen
+                  ? `slideInFromLeft 0.6s ease-out ${idx * 0.1}s both`
+                  : "none",
               }}
             >
-              <span className="relative z-10">{section}</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-blue-500/20 group-hover:via-purple-500/20 group-hover:to-pink-500/20 blur-2xl transition-all duration-500" />
+              {SECTION_LABELS[section]}
             </button>
           ))}
+          <button
+            onClick={() => scrollToSection("contact")}
+            className="px-6 py-3 rounded-full bg-white text-[#14532d] font-semibold mt-4"
+          >
+            Contact Me
+          </button>
         </div>
       </div>
 
       {/* Home Section */}
-      <section 
-        ref={(el) => {sectionsRef.current['home'] = el}}
-        id="home" 
-        className="min-h-screen flex items-center relative py-20"
+      <section
+        ref={(el) => {
+          sectionsRef.current["home"] = el;
+        }}
+        id="home"
+        className="min-h-screen flex flex-col relative pt-[72px] overflow-hidden"
       >
-        <div className="max-w-7xl mx-auto w-full grid md:grid-cols-2 gap-12 items-center z-10">
-          {/* Left Column - Content */}
-          <div className="text-left">
-            <h1 
-              className="text-5xl md:text-7xl font-thin mb-4 text-white leading-tight tracking-tight"
-              data-animate="true"
-              id="home-title"
-            >
-              <span className={`inline-block transition-all duration-700 ${
-                visibleElements.has('home-title') ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-              }`}>Ivy</span>
-              <br />
-              <span className={`inline-block transition-all duration-700 delay-100 ${
-                visibleElements.has('home-title') ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-              }`}>Malika</span>
-            </h1>
-            
-            <h2 
-              className="text-2xl md:text-3xl font-light mb-6 bg-gradient-to-r from-pink-400 to-blue-400 bg-clip-text text-transparent"
-              data-animate="true"
-              id="home-subtitle"
-              style={{
-                opacity: visibleElements.has('home-subtitle') ? 1 : 0,
-                transform: visibleElements.has('home-subtitle') ? 'translateY(0)' : 'translateY(20px)'
-              }}
-            >
-              Full Stack Developer
-            </h2>
-            
-            <p 
-              className="text-lg md:text-xl text-gray-300 mb-8 max-w-xl leading-relaxed transition-all duration-700 delay-200"
-              data-animate="true"
-              id="home-description"
-              style={{
-                opacity: visibleElements.has('home-description') ? 1 : 0,
-                transform: visibleElements.has('home-description') ? 'translateY(0)' : 'translateY(20px)'
-              }}
-            >
-              I&apos;m a software engineer passionate about full-stack development, creating beautiful web experiences, and building applications that make a difference.
-            </p>
-
-            {/* Social Media Icons */}
-            <div 
-              className="flex gap-4 mb-8 transition-all duration-700 delay-300"
-              data-animate="true"
-              id="home-social"
-              style={{
-                opacity: visibleElements.has('home-social') ? 1 : 0,
-                transform: visibleElements.has('home-social') ? 'translateY(0)' : 'translateY(20px)'
-              }}
-            >
-              <a href="https://www.linkedin.com/in/ivy-ayuko" target="_blank" rel="noopener noreferrer" className="text-white hover:text-blue-400 transition-colors">
-                <Linkedin size={24} />
-              </a>
-              <a href="https://github.com/MALIKAIVY" target="_blank" rel="noopener noreferrer" className="text-white hover:text-purple-400 transition-colors">
-                <Github size={24} />
-              </a>
-              <a href="mailto:ayukoivy03@gmail.com" className="text-white hover:text-pink-400 transition-colors">
-                <Mail size={24} />
-              </a>
-            </div>
-
-            {/* Buttons */}
-            <div 
-              className="flex gap-4 flex-wrap transition-all duration-700 delay-400"
-              data-animate="true"
-              id="home-buttons"
-              style={{
-                opacity: visibleElements.has('home-buttons') ? 1 : 0,
-                transform: visibleElements.has('home-buttons') ? 'translateY(0)' : 'translateY(20px)'
-              }}
-            >
-              <button 
-                onClick={() => scrollToSection('projects')}
-                className="group relative px-6 py-3 text-sm bg-gradient-to-r from-blue-500 to-purple-600 rounded-full font-light hover:scale-105 transition-all duration-300 overflow-hidden"
+        {/* Hero content */}
+        <div className="bg-white relative flex-1 pb-20 md:pb-0">
+          <div className="container mx-auto w-full grid md:grid-cols-2 gap-12 items-center px-6 py-8 md:py-12 z-10">
+            {/* Left - greeting, headline, description, CTAs */}
+            <div className="text-left">
+              {/* Hello There! - outlined box with corner markers */}
+              <div
+                className="inline-block mb-6 relative px-4 py-2 border-2 border-[#f59e0b] rounded"
+                data-animate="true"
+                id="home-hello"
               >
-                <span className="relative z-10 flex items-center gap-2">
-                  My Work
-                  <ExternalLink size={16} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                <span className="absolute -top-1 -left-1 w-2 h-2 bg-[#f59e0b]" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#f59e0b]" />
+                <span className="absolute -bottom-1 -left-1 w-2 h-2 bg-[#f59e0b]" />
+                <span className="absolute -bottom-1 -right-1 w-2 h-2 bg-[#f59e0b]" />
+                <span className="text-[#1a1a1a] font-semibold text-lg">
+                  Hello There!
                 </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Sparkles className="absolute top-1 right-1 w-3 h-3 text-white animate-ping" />
-                </div>
-              </button>
-              <button 
-                onClick={() => scrollToSection('contact')}
-                className="relative px-6 py-3 text-sm border-2 border-white/20 rounded-full font-light hover:bg-white/10 hover:border-white/40 transition-all duration-300 group overflow-hidden"
-              >
-                <span className="relative z-10">Get In Touch</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-              </button>
-            </div>
-          </div>
+              </div>
 
-          {/* Right Column - Avatar */}
-          <div className="flex justify-center md:justify-end pr-4 md:pr-8">
-            <div 
-              className="inline-block group"
-              data-animate="true"
-              id="home-avatar"
-            >
-              <div className={`w-64 h-64 md:w-80 md:h-80 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-1 transition-all duration-1000 ${
-                visibleElements.has('home-avatar') ? 'scale-100 rotate-0' : 'scale-0 rotate-180'
-              } group-hover:scale-105 group-hover:rotate-6`}>
-                <div className="w-full h-full rounded-full bg-gray-100 flex items-center justify-center relative overflow-hidden">
-                  <Image 
-                    src="/logo-picture.jpeg" 
-                    alt="Ivy Malika" 
-                    width={320}
-                    height={320}
-                    className="w-full h-full object-cover rounded-full relative z-10"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-purple-500/30 to-pink-500/0 animate-shimmer" />
+              <h1
+                className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1a1a1a] leading-tight mb-2"
+                data-animate="true"
+                id="home-title"
+              >
+                I&apos;m{" "}
+                <span className="text-[#f59e0b] border-b-4 border-[#f59e0b] pb-1">
+                  Ivy Malika
+                </span>
+                ,
+              </h1>
+              <p className="text-2xl md:text-3xl font-bold text-[#1a1a1a] mb-2">
+                Full Stack Developer
+              </p>
+              <p className="text-xl md:text-2xl font-bold text-[#1a1a1a] mb-6">
+                Based in Kenya.
+              </p>
+
+              <p
+                className="text-base md:text-lg text-neutral-600 mb-8 max-w-xl leading-relaxed"
+                data-animate="true"
+                id="home-description"
+              >
+                I&apos;m a software engineer passionate about full-stack
+                development, creating beautiful web experiences, and building
+                applications that make a difference.
+              </p>
+
+              {/* CTAs - Hire Me (outline) */}
+              <div className="flex flex-wrap items-center gap-4">
+                <button
+                  onClick={() => scrollToSection("contact")}
+                  className="px-6 py-3.5 border-2 border-[#1a1a1a] rounded-full font-semibold text-[#1a1a1a] hover:bg-[#1a1a1a] hover:text-white transition-all duration-300"
+                >
+                  Hire Me
+                </button>
+              </div>
+            </div>
+
+            {/* Right - image, decorative shape behind, skill tags, Hire Me badge */}
+            <div className="relative flex justify-center md:justify-end">
+              <div className="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96">
+                {/* Filled colored blob shapes behind the image */}
+                <div
+                  className="absolute inset-0 z-0 pointer-events-none overflow-visible"
+                  aria-hidden
+                >
+                  {/* Amber blob - large, behind shoulder */}
+                  <div className="absolute -top-4 -right-8 w-64 h-64 md:w-80 md:h-80 rounded-[60%_40%_50%_50%] bg-[#f59e0b]/40 blur-[1px] rotate-12" />
+                  <div className="absolute top-1/4 -right-4 w-48 h-48 md:w-56 md:h-56 rounded-[40%_60%_60%_40%] bg-[#f59e0b]/30 -rotate-12" />
+                  {/* Dark green blob */}
+                  <div className="absolute -bottom-4 -left-4 w-40 h-40 md:w-52 md:h-52 rounded-[50%_50%_40%_60%] bg-[#14532d]/25 rotate-[-20deg]" />
+                  <div className="absolute top-1/2 -left-8 w-32 h-32 rounded-[60%_40%_50%_50%] bg-[#14532d]/20 -rotate-6" />
+                </div>
+                {/* Photo - same image as About section */}
+                <div className="absolute inset-0 flex items-center justify-center z-10 min-h-[280px] md:min-h-[340px] translate-y-0 md:translate-y-16">
+                  <div className="relative flex items-end justify-center max-w-[280px] md:max-w-[340px] lg:max-w-[400px] max-h-[75vh] w-full h-full">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/about.png"
+                      alt="Ivy Malika"
+                      className="w-full h-auto max-h-[75vh] object-contain object-bottom"
+                      onError={(e) => {
+                        const el = e.currentTarget;
+                        if (el.src.includes("/about.png")) {
+                          el.src = "/hero.png";
+                          el.onerror = () => {
+                            el.src = "/logo-picture.jpeg";
+                            el.onerror = null;
+                          };
+                        } else if (el.src.includes("/hero.png")) {
+                          el.src = "/logo-picture.jpeg";
+                          el.onerror = null;
+                        }
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Scroll Down Arrow */}
-        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-10">
-          <button 
-            onClick={() => scrollToSection('about')}
-            className="animate-bounce-slow inline-block text-gray-400 hover:text-white transition-colors group"
-          >
-            <ArrowDown size={32} className="group-hover:translate-y-1 transition-transform" />
-          </button>
-        </div>
-
-        {/* Floating particles (You'll need to define 'float' and 'twinkle' keyframes in your CSS/Tailwind config) */}
-        {mounted && (
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {particles.map((particle, i) => (
-              <div
-                key={i}
-                className="absolute rounded-full"
-                style={{
-                  width: `${particle.width}px`,
-                  height: `${particle.height}px`,
-                  left: `${particle.left}%`,
-                  top: `${particle.top}%`,
-                  background: `rgba(${particle.colorChoice ? '99, 102, 241' : '168, 85, 247'}, ${particle.opacity})`,
-                  animation: `float ${particle.floatDuration}s ease-in-out infinite, twinkle ${particle.twinkleDuration}s ease-in-out infinite`,
-                  animationDelay: `${particle.animationDelay}s`,
-                }}
-              />
-            ))}
-          </div>
-        )}
       </section>
 
-      {/* About Section */}
-      <section 
-        ref={(el) => {sectionsRef.current['about'] = el}}
-        id="about" 
-        className="min-h-screen flex items-center justify-center px-6 py-20 relative"
+      {/* Bottom accent strip - tapered to nothing */}
+      <div className="w-full relative z-10 h-8" style={{ clipPath: "polygon(0 0, 100% 100%, 0 100%)" }}>
+        <div className="w-full h-full bg-[#f59e0b]" />
+      </div>
+
+      {/* Services Section - white background; cards use accent */}
+      <section
+        ref={(el) => {
+          sectionsRef.current["services"] = el;
+        }}
+        id="services"
+        className="px-6 pt-12 pb-20 relative bg-white"
       >
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent" />
-        
-        <div className="max-w-4xl relative">
-          <h2 
-            className="text-4xl md:text-6xl font-light mb-12 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent transition-all duration-1000"
+        <div className="absolute top-0 left-0 right-0 h-px bg-neutral-200" />
+        <div className="container mx-auto">
+          <h2
+            className="text-4xl md:text-5xl font-semibold mb-4 text-center text-[#1a1a1a]"
             data-animate="true"
-            id="about-title"
-            style={{
-              opacity: visibleElements.has('about-title') ? 1 : 0,
-              transform: visibleElements.has('about-title') ? 'translateX(0) scale(1)' : 'translateX(-50px) scale(0.9)'
-            }}
+            id="services-title"
           >
-            About Me
+            Services
           </h2>
-          
-          <div className="space-y-6 text-xl text-gray-300 leading-relaxed">
-            {[
-              "I'm a passionate developer who loves turning ideas into reality through code. With a focus on creating seamless user experiences, I combine technical expertise with creative design to build applications that not only work flawlessly but also delight users.",
-              "My journey in web development has been driven by curiosity and a constant desire to learn. I believe in writing clean, maintainable code and staying updated with the latest technologies and best practices."
-            ].map((text, idx) => (
-              <p 
-                key={idx}
-                className="transition-all duration-700"
+          <p className="text-lg text-neutral-500 text-center mb-14 max-w-2xl mx-auto">
+            What I offer to bring your ideas to life
+          </p>
+          <div className="grid md:grid-cols-3 gap-8">
+            {services.map((service, idx) => {
+              const Icon = service.icon;
+              return (
+                <div
+                  key={idx}
+                  className="p-8 rounded-2xl bg-[#F5F5F5] border border-neutral-200/80 shadow-sm hover:shadow-md hover:border-[#14532d]/40 transition-all duration-300"
+                  data-animate="true"
+                  id={`service-${idx}`}
+                >
+                  <div className="w-12 h-12 rounded-xl bg-[#14532d] text-[#f59e0b] flex items-center justify-center mb-6">
+                    <Icon size={24} strokeWidth={2} />
+                  </div>
+                  <h3 className="text-lg font-semibold text-[#1a1a1a] mb-3">
+                    {service.title}
+                  </h3>
+                  <p className="text-neutral-600 leading-relaxed">
+                    {service.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-neutral-200" />
+      </section>
+
+      {/* About Section - inspo: dark green bg, left = circular photo + skill tags, right = heading, bio, stats, Download CV, signature */}
+      <section
+        ref={(el) => {
+          sectionsRef.current["about"] = el;
+        }}
+        id="about"
+        className="flex items-center justify-center px-6 pt-20 pb-12 md:pt-24 md:pb-16 relative bg-[#14532d] overflow-visible"
+      >
+        <div className="container mx-auto w-full relative">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left - circle with image; head can span above circle */}
+            <div className="relative flex justify-center lg:justify-start order-2 lg:order-1 -translate-y-8 md:-translate-y-12 overflow-visible">
+              <div className="relative w-72 h-72 md:w-96 md:h-96 max-w-full overflow-visible">
+                {/* Amber circle – behind */}
+                <div
+                  className="absolute inset-0 rounded-full bg-[#f59e0b] z-0"
+                  aria-hidden
+                />
+                {/* Image – taller container so head can extend above circle */}
+                <div className="absolute bottom-0 left-0 right-0 h-[125%] z-10 overflow-visible">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/about.png"
+                    alt="Ivy Malika"
+                    className="w-full h-full object-cover object-[65%_58%] rounded-full"
+                    onError={(e) => {
+                      const el = e.currentTarget;
+                      if (el.src.includes("/about.png")) {
+                        el.src = "/hero.png";
+                        el.onerror = () => {
+                          el.src = "/logo-picture.jpeg";
+                          el.onerror = null;
+                        };
+                      } else if (el.src.includes("/hero.png")) {
+                        el.src = "/logo-picture.jpeg";
+                        el.onerror = null;
+                      }
+                    }}
+                  />
+                </div>
+                {/* Skill tags - mix of amber and dark green pills around the circle */}
+                {[
+                  { label: "UX/UI Design", amber: true },
+                  { label: "Website Design", amber: true },
+                  { label: "Mobile App Design", amber: false },
+                  { label: "Design System", amber: false },
+                  { label: "Prototype", amber: false },
+                  { label: "Dashboard", amber: false },
+                  { label: "Wireframe Design", amber: false },
+                ].map((tag, i) => {
+                  const positions = [
+                    "absolute -bottom-2 right-8",
+                    "absolute bottom-8 -right-2",
+                    "absolute top-1/4 -right-4",
+                    "absolute -top-2 left-1/2 -translate-x-1/2",
+                    "absolute top-1/4 -left-4",
+                    "absolute bottom-8 -left-2",
+                    "absolute -bottom-2 left-8",
+                  ];
+                  return (
+                    <span
+                      key={i}
+                      className={`${positions[i]} z-20 px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap ${
+                        tag.amber
+                          ? "bg-[#f59e0b] text-[#1a1a1a]"
+                          : "bg-[#14532d] border border-[#f59e0b]/50 text-white"
+                      }`}
+                    >
+                      {tag.label}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Right - About Me label, heading, bio, stats, Download CV, signature */}
+            <div className="order-1 lg:order-2 text-white">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="w-12 h-0.5 bg-[#f59e0b] rounded" />
+                <span className="text-sm font-medium uppercase tracking-widest text-white/90">
+                  About Me
+                </span>
+              </div>
+              <h2
+                className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-white transition-all duration-1000"
                 data-animate="true"
-                id={`about-p-${idx}`}
-                style={{
-                  opacity: visibleElements.has(`about-p-${idx}`) ? 1 : 0,
-                  transform: visibleElements.has(`about-p-${idx}`) ? 'translateX(0)' : 'translateX(-30px)',
-                  transitionDelay: `${idx * 100}ms`
-                }}
+                id="about-title"
               >
-                {text}
+                Who is{" "}
+                <span className="text-[#f59e0b] italic font-serif">
+                  Ivy Malika?
+                </span>
+              </h2>
+              <p className="text-white/90 text-base md:text-lg leading-relaxed mb-8 max-w-xl">
+                I&apos;m a passionate developer who loves turning ideas into
+                reality through code. With a focus on creating seamless user
+                experiences, I combine technical expertise with creative design
+                to build applications that not only work flawlessly but also
+                delight users.
               </p>
-            ))}
+              {/* Stats row */}
+              <div className="flex flex-wrap gap-8 md:gap-12 mb-8">
+                {[
+                  { value: "10+", label: "Projects Completed" },
+                  { value: "2+", label: "Years of Experience" },
+                  { value: "10+", label: "Technologies" },
+                ].map((stat, i) => (
+                  <div key={i}>
+                    <div className="text-2xl md:text-3xl font-bold text-white">
+                      {stat.value}
+                    </div>
+                    <div className="text-sm text-white/80">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-wrap items-center gap-6">
+                <a
+                  href="/cv.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#f59e0b] text-[#1a1a1a] font-semibold rounded-full hover:bg-amber-400 transition-colors"
+                >
+                  Download CV
+                  <ArrowRight size={18} className="text-[#1a1a1a]" />
+                </a>
+                <span
+                  className="text-[#f59e0b] italic text-xl font-serif"
+                  style={{ fontFamily: "Georgia, serif" }}
+                >
+                  Ivy Malika
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Projects Section */}
-      <section 
-        ref={(el) => {sectionsRef.current['projects'] = el}}
-        id="projects" 
+      {/* Skills & Certifications Section - tools and certifications after About */}
+      <section
+        ref={(el) => {
+          sectionsRef.current["skills"] = el;
+        }}
+        id="skills"
+        className="px-6 py-16 md:py-20 relative bg-white"
+      >
+        <div className="absolute top-0 left-0 right-0 h-px bg-neutral-200" />
+        <div className="container mx-auto">
+          <h2 className="text-4xl md:text-5xl font-semibold mb-4 text-center text-[#1a1a1a]">
+            Skills & Expertise
+          </h2>
+          <p className="text-lg text-neutral-500 text-center mb-12 max-w-2xl mx-auto">
+            Technologies and tools I work with
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-16">
+            {skills.map((skill, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col items-center text-center p-4 rounded-xl bg-[#F5F5F5] border border-neutral-200 shadow-sm hover:border-[#14532d]/30 hover:shadow-md transition-all duration-300"
+              >
+                <skill.icon size={36} color={skill.color} className="mb-2" />
+                <span className="text-sm font-medium text-[#1a1a1a]">
+                  {skill.name}
+                </span>
+              </div>
+            ))}
+          </div>
+          <h2 className="text-4xl md:text-5xl font-semibold mb-4 text-center text-[#1a1a1a]">
+            Certifications
+          </h2>
+          <p className="text-lg text-neutral-500 text-center mb-12 max-w-2xl mx-auto">
+            Professional certifications and training
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {certifications.map((cert, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col items-center text-center p-6 rounded-2xl bg-[#F5F5F5] border border-neutral-200 shadow-sm hover:border-[#14532d]/30 hover:shadow-md transition-all duration-300"
+              >
+                {cert.name === "Microsoft Azure AI in Cloud" ||
+                cert.name === "Fundamentals of Cloud Computing" ? (
+                  <div style={{ color: cert.color }} className="mb-3">
+                    <cert.icon size={48} />
+                  </div>
+                ) : (
+                  <cert.icon size={48} color={cert.color} className="mb-3" />
+                )}
+                <span className="text-sm font-semibold text-[#1a1a1a] leading-snug">
+                  {cert.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-neutral-200" />
+      </section>
+
+      {/* Projects Section - card style like Behance template */}
+      <section
+        ref={(el) => {
+          sectionsRef.current["projects"] = el;
+        }}
+        id="projects"
         className="min-h-screen px-6 py-20 relative"
       >
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
-        
-        <div className="max-w-7xl mx-auto">
-          <h2 
-            className="text-4xl md:text-6xl font-light mb-8 text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent transition-all duration-1000"
+        <div className="absolute top-0 left-0 right-0 h-px bg-neutral-200" />
+
+        <div className="container mx-auto">
+          <h2
+            className="text-4xl md:text-5xl font-semibold mb-4 text-center text-[#1a1a1a] transition-all duration-1000"
             data-animate="true"
             id="projects-title"
             style={{
-              opacity: visibleElements.has('projects-title') ? 1 : 0,
-              transform: visibleElements.has('projects-title') ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.95)',
+              opacity: visibleElements.has("projects-title") ? 1 : 0,
+              transform: visibleElements.has("projects-title")
+                ? "translateY(0) scale(1)"
+                : "translateY(30px) scale(0.95)",
             }}
           >
             Featured Projects
           </h2>
-          
-          <p 
-            className="text-xl text-gray-400 text-center mb-20 max-w-2xl mx-auto transition-all duration-700"
+
+          <p
+            className="text-lg text-neutral-500 text-center mb-16 max-w-2xl mx-auto transition-all duration-700"
             data-animate="true"
             id="projects-subtitle"
             style={{
-              opacity: visibleElements.has('projects-subtitle') ? 1 : 0,
-              transform: visibleElements.has('projects-subtitle') ? 'translateY(0)' : 'translateY(20px)',
-              transitionDelay: '100ms'
+              opacity: visibleElements.has("projects-subtitle") ? 1 : 0,
+              transform: visibleElements.has("projects-subtitle")
+                ? "translateY(0)"
+                : "translateY(20px)",
+              transitionDelay: "100ms",
             }}
           >
-            A showcase of my recent work, each telling a unique story of problem-solving and creativity
+            A showcase of my recent work, each telling a unique story of
+            problem-solving and creativity
           </p>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {projects.map((project, idx) => (
               <div
                 key={idx}
-                className="group relative rounded-3xl p-8 border border-white/10 hover:border-white/30 transition-all duration-700 overflow-hidden cursor-pointer"
+                className="group relative rounded-2xl overflow-hidden bg-white border border-neutral-200 shadow-sm hover:shadow-md transition-all duration-300"
                 data-animate="true"
                 id={`project-${idx}`}
                 style={{
                   opacity: visibleElements.has(`project-${idx}`) ? 1 : 0,
-                  transform: visibleElements.has(`project-${idx}`) ? 'translateY(0)' : 'translateY(50px)',
+                  transform: visibleElements.has(`project-${idx}`)
+                    ? "translateY(0)"
+                    : "translateY(30px)",
                   transitionDelay: `${200 + idx * 100}ms`,
-                  backgroundImage: project.image && (project.image.startsWith('http') || project.image.startsWith('/'))
-                    ? `url("${project.image}")`
-                    : undefined,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat'
                 }}
               >
-                {/* Background overlay - dark layer for text readability */}
-                <div className="absolute inset-0 bg-black/50 group-hover:bg-black/40 transition-all duration-700" />
-                
-                <div className="relative z-10">
-                  <h3 className="text-xl font-light mb-4 text-white transition-all duration-300 group-hover:text-white drop-shadow-lg">
+                {/* Image / placeholder area */}
+                <div
+                  className="h-48 bg-neutral-100 relative overflow-hidden"
+                  style={{
+                    backgroundImage:
+                      project.image &&
+                      (project.image.startsWith("http") ||
+                        project.image.startsWith("/"))
+                        ? `url("${project.image}")`
+                        : undefined,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  }}
+                >
+                  {!project.image?.startsWith("http") &&
+                    !project.image?.startsWith("/") && (
+                      <div className="absolute inset-0 flex items-center justify-center text-5xl bg-neutral-200/50">
+                        {project.image || "📁"}
+                      </div>
+                    )}
+                </div>
+
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold mb-2 text-[#1a1a1a]">
                     {project.title}
                   </h3>
-                  <p className="text-gray-200 mb-6 leading-relaxed group-hover:text-gray-100 transition-colors drop-shadow-md">
+                  <p className="text-neutral-600 text-sm mb-4 leading-relaxed">
                     {project.description}
                   </p>
-                  
-                  <div className="flex flex-wrap gap-2 mb-8">
+
+                  <div className="flex flex-wrap gap-2 mb-6">
                     {project.tech.map((tech, i) => (
                       <span
                         key={i}
-                        className="px-3 py-1.5 bg-white/20 rounded-full text-sm text-white border border-white/30 transition-all duration-300 group-hover:bg-white/30 group-hover:border-white/50 group-hover:scale-105 font-medium"
-                        style={{ transitionDelay: `${i * 50}ms` }}
+                        className="px-2.5 py-1 bg-neutral-100 rounded-md text-xs font-medium text-neutral-600"
                       >
                         {tech}
                       </span>
@@ -617,365 +930,308 @@ export default function Portfolio() {
 
                   <div className="flex gap-4">
                     {project.codeLink ? (
-                      <a 
+                      <a
                         href={project.codeLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-white hover:text-gray-200 transition-all group/btn font-medium"
+                        className="flex items-center gap-2 text-[#14532d] hover:text-[#f59e0b] font-medium text-sm transition-colors"
                       >
-                        <Github size={20} className="group-hover/btn:rotate-12 transition-transform" />
-                        <span>Code</span>
+                        <Github size={18} />
+                        Code
                       </a>
                     ) : (
-                      <button className="flex items-center gap-2 text-white hover:text-gray-200 transition-all group/btn font-medium">
-                        <Github size={20} className="group-hover/btn:rotate-12 transition-transform" />
-                        <span>Code</span>
-                      </button>
+                      <span className="flex items-center gap-2 text-neutral-400 text-sm">
+                        Code —
+                      </span>
                     )}
                     {project.liveLink ? (
-                      <a 
+                      <a
                         href={project.liveLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-white hover:text-gray-200 transition-all group/btn font-medium"
+                        className="flex items-center gap-2 text-[#14532d] hover:text-[#f59e0b] font-medium text-sm transition-colors"
                       >
-                        <ExternalLink size={20} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
-                        <span>Live</span>
+                        <ExternalLink size={18} />
+                        Live
                       </a>
                     ) : (
-                      <button className="flex items-center gap-2 text-white hover:text-gray-200 transition-all group/btn font-medium">
-                        <ExternalLink size={20} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
-                        <span>Live</span>
-                      </button>
+                      <span className="flex items-center gap-2 text-neutral-400 text-sm">
+                        Live —
+                      </span>
                     )}
                   </div>
                 </div>
-
-                <div className={`absolute top-0 right-0 w-20 h-20 bg-gradient-to-br ${project.gradient} opacity-20 blur-2xl transition-all duration-700 group-hover:w-40 group-hover:h-40`} />
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Skills Section */}
-      <section 
-        ref={(el) => {sectionsRef.current['skills'] = el}}
-        id="skills" 
-        className="px-6 pt-20 pb-20 relative"
+      {/* Testimonials Section - inspo: Testimonials Page */}
+      <section
+        ref={(el) => {
+          sectionsRef.current["testimonials"] = el;
+        }}
+        id="testimonials"
+        className="px-6 py-20 relative"
       >
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent" />
-        
-        <div className="max-w-6xl mx-auto">
-          <h2 
-            className="text-4xl md:text-6xl font-light mb-8 text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent transition-all duration-1000"
-            data-animate="true"
-            id="skills-title"
-            style={{
-              opacity: visibleElements.has('skills-title') ? 1 : 0,
-              transform: visibleElements.has('skills-title') ? 'scale(1)' : 'scale(0.8)',
-            }}
-          >
-            Skills & Expertise
+        <div className="absolute top-0 left-0 right-0 h-px bg-neutral-200" />
+        <div className="container mx-auto">
+          <h2 className="text-4xl md:text-5xl font-semibold mb-4 text-center text-[#1a1a1a]">
+            Testimonials
           </h2>
-          
-          <p 
-            className="text-xl text-gray-400 text-center mb-16 max-w-2xl mx-auto transition-all duration-700"
-            data-animate="true"
-            id="skills-subtitle"
-            style={{
-              opacity: visibleElements.has('skills-subtitle') ? 1 : 0,
-              transform: visibleElements.has('skills-subtitle') ? 'translateY(0)' : 'translateY(20px)',
-              transitionDelay: '100ms'
-            }}
-          >
-            Technologies and tools I use to bring ideas to life
+          <p className="text-lg text-neutral-500 text-center mb-14 max-w-2xl mx-auto">
+            What others say about working with me
           </p>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
-            {skills.map((skill, idx) => (
+          <div className="grid md:grid-cols-2 gap-8">
+            {testimonials.map((t, idx) => (
               <div
                 key={idx}
-                className="group flex flex-col items-center text-center cursor-pointer"
-                data-animate="true"
-                id={`skill-${idx}`}
-                style={{
-                  opacity: visibleElements.has(`skill-${idx}`) ? 1 : 0,
-                  transform: visibleElements.has(`skill-${idx}`) 
-                    ? 'translateY(0) scale(1)' 
-                    : 'translateY(30px) scale(0.8)',
-                  transition: `all 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${idx * 100}ms`
-                }}
+                className="p-8 rounded-2xl bg-white border border-neutral-200 shadow-sm hover:shadow-md transition-all duration-300"
               >
-                <div 
-                  className="mb-3 group-hover:scale-125 group-hover:-translate-y-2 transition-all duration-500 ease-out"
-                  style={{
-                    animation: visibleElements.has(`skill-${idx}`) 
-                      ? `float 3s ease-in-out infinite ${idx * 0.2}s` 
-                      : 'none'
-                  }}
-                >
-                  <skill.icon size={40} color={skill.color} />
-                </div>
-                
-                <h3 className="text-base font-light text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-500 group-hover:bg-clip-text transition-all duration-300">
-                  {skill.name}
-                </h3>
+                <p className="text-neutral-600 leading-relaxed mb-6">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <p className="font-semibold text-[#1a1a1a]">{t.name}</p>
+                <p className="text-sm text-neutral-500">{t.role}</p>
               </div>
             ))}
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-neutral-200" />
       </section>
 
-      {/* Certifications Section */}
-      <section 
-        ref={(el) => {sectionsRef.current['certifications'] = el}}
-        id="certifications" 
-        className="px-6 pt-20 pb-20 relative"
+      {/* Let's Connect Section - contact form + reach out */}
+      <section
+        ref={(el) => {
+          sectionsRef.current["contact"] = el;
+        }}
+        id="contact"
+        className="relative px-6 py-16 md:py-24 overflow-hidden"
       >
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent" />
-        
-        <div className="max-w-6xl mx-auto">
-          <h2 
-            className="text-4xl md:text-6xl font-light mb-8 text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent transition-all duration-1000"
-            data-animate="true"
-            id="certifications-title"
-            style={{
-              opacity: visibleElements.has('certifications-title') ? 1 : 0,
-              transform: visibleElements.has('certifications-title') ? 'scale(1)' : 'scale(0.8)',
-            }}
-          >
-            Certifications
-          </h2>
-          
-          <p 
-            className="text-xl text-gray-400 text-center mb-16 max-w-2xl mx-auto transition-all duration-700"
-            data-animate="true"
-            id="certifications-subtitle"
-            style={{
-              opacity: visibleElements.has('certifications-subtitle') ? 1 : 0,
-              transform: visibleElements.has('certifications-subtitle') ? 'translateY(0)' : 'translateY(20px)',
-              transitionDelay: '100ms'
-            }}
-          >
-            Professional certifications validating my expertise
-          </p>
+        {/* Subtle background accent */}
+        <div
+          className="absolute inset-0 bg-gradient-to-b from-[#14532d]/[0.04] via-transparent to-[#f59e0b]/[0.04]"
+          aria-hidden
+        />
+        <div className="absolute top-0 left-0 right-0 h-px bg-neutral-200" />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-            {certifications.map((cert, idx) => (
-              <div
-                key={idx}
-                className="group flex flex-col items-center text-center cursor-pointer"
-                data-animate="true"
-                id={`cert-${idx}`}
-                style={{
-                  opacity: visibleElements.has(`cert-${idx}`) ? 1 : 0,
-                  transform: visibleElements.has(`cert-${idx}`) 
-                    ? 'translateY(0) scale(1)' 
-                    : 'translateY(30px) scale(0.8)',
-                  transition: `all 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${idx * 100}ms`
-                }}
-              >
-                <div 
-                  className="mb-4 group-hover:scale-125 group-hover:-translate-y-2 transition-all duration-500 ease-out"
-                  style={{
-                    animation: visibleElements.has(`cert-${idx}`) 
-                      ? `float 3s ease-in-out infinite ${idx * 0.2}s` 
-                      : 'none'
-                  }}
-                >
-                  {cert.name === "Microsoft Azure AI in Cloud" || cert.name === "Fundamentals of Cloud Computing" ? (
-                    <div style={{ color: cert.color }}>
-                      <cert.icon size={60} />
-                    </div>
-                  ) : (
-                    <cert.icon size={60} color={cert.color} />
-                  )}
-                </div>
-                
-                <h3 className="text-lg font-light text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-500 group-hover:bg-clip-text transition-all duration-300">
-                  {cert.name}
-                </h3>
-              </div>
-            ))}
+        <div className="container mx-auto relative">
+          {/* Header with accent line */}
+          <div className="text-center max-w-2xl mx-auto mb-14 md:mb-16">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <span className="w-12 h-0.5 bg-[#f59e0b] rounded" />
+              <span className="text-sm font-medium uppercase tracking-widest text-[#14532d]">
+                Get in touch
+              </span>
+              <span className="w-12 h-0.5 bg-[#f59e0b] rounded" />
+            </div>
+            <h2
+              className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#1a1a1a] mb-4"
+              data-animate="true"
+              id="contact-title"
+            >
+              Let&apos;s Connect
+            </h2>
+            <p
+              className="text-lg md:text-xl text-neutral-600 leading-relaxed"
+              data-animate="true"
+              id="contact-subtitle"
+            >
+              Have a project in mind? Drop a message and I&apos;ll get back
+              within 1–2 days.
+            </p>
           </div>
-        </div>
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent" />
-      </section>
 
-      {/* Contact Section */}
-      <section 
-        ref={(el) => {sectionsRef.current['contact'] = el}}
-        id="contact" 
-        className="min-h-screen flex items-center justify-center px-6 pt-20 pb-20"
-      >
-        <div className="max-w-4xl w-full">
-          <h2 
-            className="text-5xl md:text-7xl font-light mb-8 text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent transition-all duration-1000"
-            data-animate="true"
-            id="contact-title"
-            style={{
-              opacity: visibleElements.has('contact-title') ? 1 : 0,
-              transform: visibleElements.has('contact-title') ? 'scale(1)' : 'scale(0.8)',
-            }}
-          >
-            Let&apos;s Connect
-          </h2>
-          
-          <p 
-            className="text-xl text-gray-400 text-center mb-16 transition-all duration-700"
-            data-animate="true"
-            id="contact-subtitle"
-            style={{
-              opacity: visibleElements.has('contact-subtitle') ? 1 : 0,
-              transform: visibleElements.has('contact-subtitle') ? 'translateY(0)' : 'translateY(20px)',
-              transitionDelay: '100ms'
-            }}
-          >
-            Have a project in mind? Let&apos;s create something amazing together
-          </p>
-
-          <div className="grid md:grid-cols-2 gap-12">
-            <div 
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start max-w-5xl mx-auto">
+            {/* Form card */}
+            <div
               className="transition-all duration-700"
               data-animate="true"
               id="contact-form"
-              style={{
-                opacity: visibleElements.has('contact-form') ? 1 : 0,
-                transform: visibleElements.has('contact-form') ? 'translateX(0)' : 'translateX(-30px)',
-                transitionDelay: '200ms'
-              }}
             >
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium mb-2 text-gray-400">Name</label>
-                  <input
-                    id="name"
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    className="w-full px-4 py-3 bg-white border border-[#D4C4B0]/30 rounded-xl focus:outline-none focus:border-[#B8866C] focus:ring-2 focus:ring-[#B8866C]/20 transition-all"
-                    placeholder="Your name"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium mb-2 text-gray-400">Email</label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="w-full px-4 py-3 bg-white border border-[#D4C4B0]/30 rounded-xl focus:outline-none focus:border-[#B8866C] focus:ring-2 focus:ring-[#B8866C]/20 transition-all"
-                    placeholder="your@email.com"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium mb-2 text-gray-400">Message</label>
-                  <textarea
-                    id="message"
-                    rows={5}
-                    value={formData.message}
-                    onChange={(e) => setFormData({...formData, message: e.target.value})}
-                    className="w-full px-4 py-3 bg-white border border-[#D4C4B0]/30 rounded-xl focus:outline-none focus:border-[#B8866C] focus:ring-2 focus:ring-[#B8866C]/20 transition-all resize-none"
-                    placeholder="Tell me about your project..."
-                    required
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl font-semibold hover:scale-105 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/50 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 size={20} className="animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send size={20} className="group-hover:translate-x-1 transition-transform duration-300" />
-                      Send Message
-                    </>
-                  )}
-                </button>
-
+              <div className="p-6 md:p-8 rounded-3xl bg-white border border-neutral-200/80 shadow-lg shadow-neutral-200/50 hover:shadow-xl hover:shadow-neutral-200/50 hover:border-[#14532d]/20 transition-all duration-300">
+                <h3 className="text-lg font-semibold text-[#1a1a1a] mb-6">
+                  Send a message
+                </h3>
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div>
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-[#1a1a1a] mb-1.5"
+                    >
+                      Name
+                    </label>
+                    <input
+                      id="name"
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      className="w-full px-4 py-3 bg-neutral-50/80 border border-neutral-200 rounded-xl focus:outline-none focus:border-[#14532d] focus:ring-2 focus:ring-[#14532d]/20 transition-all text-[#1a1a1a] placeholder:text-neutral-400"
+                      placeholder="Your name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-[#1a1a1a] mb-1.5"
+                    >
+                      Email
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
+                      className="w-full px-4 py-3 bg-neutral-50/80 border border-neutral-200 rounded-xl focus:outline-none focus:border-[#14532d] focus:ring-2 focus:ring-[#14532d]/20 transition-all text-[#1a1a1a] placeholder:text-neutral-400"
+                      placeholder="you@example.com"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="message"
+                      className="block text-sm font-medium text-[#1a1a1a] mb-1.5"
+                    >
+                      Message
+                    </label>
+                    <textarea
+                      id="message"
+                      rows={5}
+                      value={formData.message}
+                      onChange={(e) =>
+                        setFormData({ ...formData, message: e.target.value })
+                      }
+                      className="w-full px-4 py-3 bg-neutral-50/80 border border-neutral-200 rounded-xl focus:outline-none focus:border-[#14532d] focus:ring-2 focus:ring-[#14532d]/20 transition-all resize-none text-[#1a1a1a] placeholder:text-neutral-400"
+                      placeholder="Tell me about your project or say hello..."
+                      required
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full px-6 py-4 bg-[#14532d] text-white rounded-xl font-semibold hover:bg-[#166534] transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 size={20} className="animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send size={20} />
+                        Send Message
+                      </>
+                    )}
+                  </button>
+                </form>
                 {submitStatus.type && (
                   <div
-                    className={`mt-4 p-4 rounded-xl flex items-center gap-3 transition-all duration-300 ${
-                      submitStatus.type === 'success'
-                        ? 'bg-green-500/10 border border-green-500/30 text-green-400'
-                        : 'bg-red-500/10 border border-red-500/30 text-red-400'
+                    className={`mt-4 p-4 rounded-xl flex items-center gap-3 text-sm ${
+                      submitStatus.type === "success"
+                        ? "bg-green-50 border border-green-200 text-green-700"
+                        : "bg-red-50 border border-red-200 text-red-700"
                     }`}
                   >
-                    {submitStatus.type === 'success' ? (
+                    {submitStatus.type === "success" ? (
                       <CheckCircle2 size={20} className="flex-shrink-0" />
                     ) : (
                       <AlertCircle size={20} className="flex-shrink-0" />
                     )}
-                    <p className="text-sm">{submitStatus.message}</p>
+                    <p>{submitStatus.message}</p>
                   </div>
                 )}
-              </form>
+              </div>
             </div>
 
-            <div 
-              className="space-y-8 transition-all duration-700"
+            {/* Reach out / contact info */}
+            <div
+              className="transition-all duration-700"
               data-animate="true"
               id="contact-info"
-              style={{
-                opacity: visibleElements.has('contact-info') ? 1 : 0,
-                transform: visibleElements.has('contact-info') ? 'translateX(0)' : 'translateX(30px)',
-                transitionDelay: '300ms'
-              }}
             >
-              {contactInfo.map((item, idx) => {
-                const Icon = item.icon;
-                return (
-                  <a
-                    key={idx}
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-6 p-6 bg-white/5 border border-white/10 rounded-2xl hover:border-white/30 transition-all duration-500 group hover:scale-[1.02] relative overflow-hidden"
-                  >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
-                    <div className={`w-14 h-14 flex items-center justify-center rounded-xl bg-gradient-to-br ${item.color} flex-shrink-0 transition-all duration-300 group-hover:rotate-6 group-hover:scale-110 shadow-lg shadow-purple-500/50`}>
-                      <Icon size={28} className="text-white" />
-                    </div>
-                    <div className="relative z-10">
-                      <p className="text-sm font-medium text-gray-400">{item.label}</p>
-                      <p className="text-xl font-semibold break-words transition-colors duration-300 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-500 group-hover:bg-clip-text">
-                        {item.value}
-                      </p>
-                    </div>
-                  </a>
-                );
-              })}
+              <h3 className="text-lg font-semibold text-[#1a1a1a] mb-6">
+                Or reach out directly
+              </h3>
+              <div className="space-y-4">
+                {contactInfo.map((item, idx) => {
+                  const Icon = item.icon;
+                  return (
+                    <a
+                      key={idx}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-4 p-5 rounded-2xl bg-white border border-neutral-200/80 shadow-md shadow-neutral-200/30 hover:shadow-lg hover:border-[#14532d]/30 hover:bg-[#14532d]/5 transition-all duration-300 group"
+                    >
+                      <div className="w-14 h-14 flex items-center justify-center rounded-2xl bg-[#14532d] text-[#f59e0b] flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+                        <Icon size={24} strokeWidth={2} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+                          {item.label}
+                        </p>
+                        <p className="font-semibold text-[#1a1a1a] truncate group-hover:text-[#14532d] transition-colors">
+                          {item.value}
+                        </p>
+                      </div>
+                      <ExternalLink
+                        size={18}
+                        className="text-neutral-400 group-hover:text-[#14532d] flex-shrink-0 transition-colors"
+                      />
+                    </a>
+                  );
+                })}
+              </div>
+              <p className="mt-6 text-sm text-neutral-500">
+                Prefer email? Write to{" "}
+                <a
+                  href="mailto:ayukoivy03@gmail.com"
+                  className="font-medium text-[#14532d] hover:underline"
+                >
+                  ayukoivy03@gmail.com
+                </a>{" "}
+                and I&apos;ll reply as soon as I can.
+              </p>
             </div>
           </div>
         </div>
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-neutral-200" />
       </section>
 
       {/* Footer */}
-      <footer className="bg-black/80 border-t border-white/10 py-10">
-        <div className="max-w-7xl mx-auto px-6 text-center text-gray-500 text-sm">
+      <footer className="bg-white border-t border-neutral-200 py-10">
+        <div className="container mx-auto px-6 text-center text-neutral-500 text-sm">
           <p className="mb-4">
-            Designed & Built by <span className="text-white font-semibold">Ivy Malika</span>
+            Designed & Built by{" "}
+            <span className="text-[#1a1a1a] font-semibold">Ivy Malika</span>
           </p>
-          <div className="flex justify-center space-x-6">
-            <a href="https://github.com/MALIKAIVY" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+          <div className="flex justify-center gap-6">
+            <a
+              href="https://github.com/MALIKAIVY"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neutral-400 hover:text-[#14532d] transition-colors"
+            >
               <Github size={20} />
             </a>
-            <a href="https://www.linkedin.com/in/ivy-ayuko" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+            <a
+              href="https://www.linkedin.com/in/ivy-ayuko"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-neutral-400 hover:text-[#14532d] transition-colors"
+            >
               <Linkedin size={20} />
             </a>
-            <a href="mailto:ayukoivy03@gmail.com" className="text-gray-400 hover:text-white transition-colors">
+            <a
+              href="mailto:ayukoivy03@gmail.com"
+              className="text-neutral-400 hover:text-[#14532d] transition-colors"
+            >
               <Mail size={20} />
             </a>
           </div>

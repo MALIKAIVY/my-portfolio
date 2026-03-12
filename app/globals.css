@@ -1,41 +1,79 @@
 @import "tailwindcss";
 
+/* Section container: centered max-width at breakpoints (sections use px-6 for padding) */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
 @layer base {
   body {
-    background: linear-gradient(135deg, #F5F1EB 0%, #E8DDD4 25%, #F5F1EB 50%, #E8DDD4 75%, #F5F1EB 100%);
-    background-size: 200% 200%;
-    animation: gradient 15s ease infinite;
-    color: #2C2416;
+    background: #FAFAF9;
+    color: #1a1a1a;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-    font-weight: 300;
+    font-weight: 400;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
   }
-  
+
   * {
     font-family: inherit;
   }
-  
-  input, textarea {
+
+  input,
+  textarea {
     font-family: inherit;
-    color: #2C2416 !important;
-    background-color: #ffffff !important;
-    border: 1px solid rgba(44, 36, 22, 0.15) !important;
+    color: #1a1a1a;
+    background-color: #fafafa;
+    border: 1px solid #e5e5e5;
     border-radius: 0.75rem;
     padding: 0.75rem 1rem;
   }
-  
-  input::placeholder, textarea::placeholder {
-    color: rgba(44, 36, 22, 0.4) !important;
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #a3a3a3;
   }
-  
-  input:focus, textarea:focus {
+
+  input:focus,
+  textarea:focus {
     outline: none;
-    border-color: rgba(184, 134, 108, 0.6) !important;
-    box-shadow: 0 0 0 2px rgba(184, 134, 108, 0.2) !important;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   }
-  
+
   button {
     font-family: inherit;
   }
@@ -46,18 +84,39 @@ html {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-20px) rotate(5deg); }
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
 }
 
 @keyframes twinkle {
-  0%, 100% { opacity: 0.2; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 @keyframes gradient {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 .animate-gradient {
@@ -66,8 +125,13 @@ html {
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .animate-shimmer {
@@ -75,13 +139,27 @@ html {
 }
 
 @keyframes slideInFromLeft {
-  from { opacity: 0; transform: translateX(-50px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes float-slow {
-  0%, 100% { transform: translateY(0px) translateX(0px); }
-  50% { transform: translateY(-30px) translateX(20px); }
+
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px);
+  }
+
+  50% {
+    transform: translateY(-30px) translateX(20px);
+  }
 }
 
 .animate-float-slow {
@@ -89,8 +167,15 @@ html {
 }
 
 @keyframes float-slower {
-  0%, 100% { transform: translateY(0px) translateX(0px); }
-  50% { transform: translateY(30px) translateX(-20px); }
+
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px);
+  }
+
+  50% {
+    transform: translateY(30px) translateX(-20px);
+  }
 }
 
 .animate-float-slower {
@@ -98,28 +183,49 @@ html {
 }
 
 @keyframes bounce-slow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .animate-bounce-slow {
   animation: bounce-slow 2s ease-in-out infinite;
 }
 
-/* Custom scrollbar */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-25%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+/* Custom scrollbar - light theme */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(232, 221, 212, 0.3);
+  background: #f5f5f5;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #D4C4B0, #C9B8A3);
-  border-radius: 5px;
+  background: #d4d4d4;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #C9B8A3, #B8866C);
+  background: #a3a3a3;
 }
