@@ -284,11 +284,11 @@ export default function Portfolio() {
       image: "✅",
     },
     {
-      title: "Weather App",
-      description: "Beautiful weather forecasts with maps and location alerts",
-      tech: ["React", "API", "Leaflet"],
-      gradient: "from-indigo-500 via-purple-500 to-pink-500",
-      image: "🌤️",
+      title: "Nutrition Application",
+      description: "Health and nutrition tracking app for meal planning and dietary goals",
+      tech: ["React", "Next.js", "Python", "PostgreSQL", "TailwindCSS"],
+      gradient: "from-green-500 via-lime-500 to-yellow-500",
+      image: "/gj.png",
     },
   ];
 
@@ -584,7 +584,7 @@ export default function Portfolio() {
       </section>
 
       {/* Bottom accent strip - tapered to nothing */}
-      <div className="w-full relative z-10 h-8" style={{ clipPath: "polygon(0 0, 100% 100%, 0 100%)" }}>
+      <div className="w-full relative z-10 h-8 mt-4 md:-mt-32" style={{ clipPath: "polygon(0 0, 100% 100%, 0 100%)" }}>
         <div className="w-full h-full bg-[#f59e0b]" />
       </div>
 
@@ -594,7 +594,7 @@ export default function Portfolio() {
           sectionsRef.current["services"] = el;
         }}
         id="services"
-        className="px-6 pt-12 pb-20 relative bg-white"
+        className="px-6 pt-8 md:pt-12 pb-20 relative bg-white"
       >
         <div className="absolute top-0 left-0 right-0 h-px bg-neutral-200" />
         <div className="container mx-auto">
